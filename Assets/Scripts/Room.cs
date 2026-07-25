@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Room
 {
     RectInt area;
-    public RectInt Area { get { return area; } }
+    public RectInt Area { get => area; }
 
     public Room(RectInt area)
     {
