@@ -530,7 +530,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 64, y: 64, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -567,9 +567,9 @@ MonoBehaviour:
   width: 64
   length: 64
   roomWidthMin: 3
-  roomWidthMax: 5
+  roomWidthMax: 10
   roomLengthMin: 3
-  roomLengthMax: 5
+  roomLengthMax: 10
   levelLayouDisplay: {fileID: 881559847}
 --- !u!4 &1925923727
 Transform:

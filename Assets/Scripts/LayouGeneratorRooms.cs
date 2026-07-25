@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class LayouGeneratedRooms : MonoBehaviour
+public class LayouGeneratorRooms : MonoBehaviour
 {
     [SerializeField] int width = 64;
     [SerializeField] int length = 64;
@@ -64,7 +64,7 @@ public class LayouGeneratedRooms : MonoBehaviour
         layoutTexture.Reinitialize(width, length);
         levelLayouDisplay.transform.localScale = new Vector3(width, length, 1);
         layoutTexture.FillWithColor(Color.black);
-        layoutTexture.DrawRectangle(roomCandidateRect, Color.cyan);
+        layoutTexture.DrawRectangle(roomCandidateRect, Color.white);
 
         Debug.Log(openDoorways.Count);
         foreach (Hallway hallway in openDoorways)
@@ -72,7 +72,7 @@ public class LayouGeneratedRooms : MonoBehaviour
             layoutTexture.SetPixel(
                 hallway.StartPositionAbsolute.x, 
                 hallway.StartPositionAbsolute.y,
-                Color.red
+                hallway.StartDirection.GetColor()
             );
         }
         layoutTexture.Apply();

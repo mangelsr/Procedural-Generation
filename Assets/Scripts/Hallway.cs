@@ -5,6 +5,9 @@ public class Hallway
     Vector2Int startPosition;
     Vector2Int endPosition;
 
+    HallwayDirection startDirection;
+    HallwayDirection endDirection;
+
     Room startRoom;
     Room endRoom;
 
@@ -30,10 +33,25 @@ public class Hallway
         get { return endPosition + endRoom.Area.position; }
     }
 
+    public HallwayDirection StartDirection
+    {
+        get { return startDirection; }
+    }
+
+    public HallwayDirection EndDirection
+    {
+        get { return endDirection; }
+        set { endDirection = value; }
+    }
+
+
     public Hallway(
-        Vector2Int startPosition, Room startRoom = null
+        HallwayDirection startDirection,
+        Vector2Int startPosition,
+        Room startRoom = null
     )
     {
+        this.startDirection = startDirection;
         this.startPosition = startPosition;
         this.startRoom = startRoom;
     }
