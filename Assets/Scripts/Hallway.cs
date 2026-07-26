@@ -1,3 +1,5 @@
+using System;
+using NUnit.Framework.Internal;
 using UnityEngine;
 
 public class Hallway
@@ -54,6 +56,32 @@ public class Hallway
     {
         get => endPosition;
         set => endPosition = value;
+    }
+
+    public RectInt Area
+    {
+        get
+        {
+            int x = Math.Min(StartPositionAbsolute.x, EndPositionAbsolute.x);
+            int y = Math.Min(StartPositionAbsolute.y, EndPositionAbsolute.y);
+
+            int width = Math.Max(1, Math.Abs(StartPositionAbsolute.x - EndPositionAbsolute.x));
+            int heigh = Math.Max(1, Math.Abs(StartPositionAbsolute.y - EndPositionAbsolute.y));
+
+            if (StartPositionAbsolute.x == EndPositionAbsolute.x)
+            {
+                y++;
+                heigh--;
+            }
+
+            if (StartPositionAbsolute.y == EndPositionAbsolute.y)
+            {
+                x++;
+                width--;
+            }
+
+            return new RectInt(x, y, width, heigh);
+        }
     }
 
 

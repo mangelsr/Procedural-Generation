@@ -564,12 +564,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd825f4bf399e139cabc9964bb9e75b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seed: 132589774
   width: 64
   length: 64
-  roomWidthMin: 3
-  roomWidthMax: 10
-  roomLengthMin: 3
-  roomLengthMax: 10
+  roomWidthMin: 4
+  roomWidthMax: 16
+  roomLengthMin: 4
+  roomLengthMax: 16
+  doorDistanceFromEdge: 1
+  hallwayLengthMin: 2
+  hallwayLengthMax: 8
+  minRoomDistance: 1
+  maxRoomCount: 10
   levelLayouDisplay: {fileID: 881559847}
 --- !u!4 &1925923727
 Transform:
