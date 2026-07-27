@@ -10,6 +10,7 @@ A Unity 6 project implementing procedural room-and-corridor dungeon generation.
 - **Seed-based generation** for reproducible layouts
 - **Collision detection** preventing room/hallway overlap
 - **Debug rendering** showing doorway positions and candidate rooms
+- **Room templates** with finite supply counts for varied layouts
 
 ## Requirements
 
@@ -28,29 +29,30 @@ A Unity 6 project implementing procedural room-and-corridor dungeon generation.
 
 ## Configuration
 
+Create a `RoomLevelLayoutConfig` ScriptableObject via **Assets > Custom > Procedural Generation > Room Level Layout Config**.
+
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| Seed | Random | Random seed for generation |
 | Width | 64 | Level width in pixels |
 | Length | 64 | Level height in pixels |
-| Room Width Min/Max | 3-5 | Room width range |
-| Room Length Min/Max | 3-5 | Room length range |
 | Door Distance From Edge | 1 | Min distance of doorways from room corners |
 | Hallway Length Min/Max | 2-6 | Hallway length range |
 | Min Room Distance | 1 | Min spacing between rooms |
-| Max Room Count | 10 | Maximum rooms to generate |
+| Room Templates | - | Array of room blueprints with size ranges and supply counts |
 
 ## Project Structure
 
 ```
 Assets/Scripts/
-├── Room.cs                    # Room data class
-├── Hallway.cs                 # Hallway data class
-├── HallwayDirection.cs        # Direction enum and extensions
-├── Level.cs                   # Level container
-├── LayouGeneratorRooms.cs     # Main generation controller
-├── LayoutGeneratorButtons.cs  # Custom editor buttons
-└── Utilities/                 # Helper classes and extensions
+├── Room.cs                        # Room data class
+├── Hallway.cs                     # Hallway data class
+├── HallwayDirection.cs            # Direction enum and extensions
+├── Level.cs                       # Level container
+├── RoomTemplate.cs                # Room blueprint definition
+├── RoomLevelLayoutConfig.cs       # ScriptableObject for level config
+├── LayouGeneratorRooms.cs         # Main generation controller
+├── LayoutGeneratorButtons.cs      # Custom editor buttons
+└── Utilities/                     # Helper classes and extensions
 ```
 
 ## Algorithm
@@ -61,3 +63,10 @@ Assets/Scripts/
 4. Match doorways by opposite direction (e.g., TOP connects to BOTTOM)
 5. Validate placement against bounds and existing rooms/hallways
 6. Repeat until room count is reached or no valid placements remain
+
+## Utilities
+
+- **Texture2DExtension** - Drawing, saving, and manipulation methods for textures
+- **PriorityQueue** - Quaternary min-heap implementation (available for future pathfinding)
+- **Array2DWrapper** - Generic 2D array wrapper with Inspector grid editor
+- **TileType** - Tile type enum for potential tilemap-based rendering
