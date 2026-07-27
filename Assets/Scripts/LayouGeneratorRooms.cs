@@ -8,19 +8,7 @@ using Random = System.Random;
 public class LayoutGeneratorRooms : MonoBehaviour
 {
     [SerializeField] int seed = Environment.TickCount;
-    [SerializeField] int width = 64;
-    [SerializeField] int length = 64;
-
-    [SerializeField] int roomWidthMin = 3;
-    [SerializeField] int roomWidthMax = 5;
-    [SerializeField] int roomLengthMin = 3;
-    [SerializeField] int roomLengthMax = 5;
-    [SerializeField] int doorDistanceFromEdge = 1;
-    [SerializeField] int hallwayLengthMin = 2;
-    [SerializeField] int hallwayLengthMax = 6;
-    [SerializeField] int minRoomDistance = 1;
-
-
+    [SerializeField] RoomLevelLayoutConfig levelConfig;
     [SerializeField] int maxRoomCount = 10;
 
     [SerializeField] GameObject levelLayouDisplay;
@@ -29,20 +17,26 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
     Random random;
     Level level;
+    Dictionary<RoomTemplate, int> availableRooms;
 
     [ContextMenu("Generat Level Layout")]
     public void GenerateLevel()
     {
         random = new Random(seed);
-        openDoorways = new List<Hallway>();
-        level = new Level(width, length);
+        availableRooms = levelConfig.GetAvaialbleRooms();
 
-        var roomRect = GetStartRoomRect();
+        openDoorways = new List<Hallway>();
+        level = new Level(levelConfig.Width, levelConfig.Length);
+
+        RoomTemplate startRoomTemplate = availableRooms.Keys.ElementAt(random.Next(availableRooms.Count));
+        UseUpRoomTemplate(startRoomTemplate);
+
+        var roomRect = GetStartRoomRect(startRoomTemplate);
         Room room = new Room(roomRect);
         Debug.Log(room);
 
         List<Hallway> hallways = room.CalcualteAllPossibleDoorways(
-            room.Area.width, room.Area.height, doorDistanceFromEdge
+            room.Area.width, room.Area.height, levelConfig.DoorDistanceFromEdge
         );
 
         hallways.ForEach(h =>
@@ -75,17 +69,17 @@ public class LayoutGeneratorRooms : MonoBehaviour
     }
 
 
-    RectInt GetStartRoomRect()
+    RectInt GetStartRoomRect(RoomTemplate roomTemplate)
     {
-        int roomWidth = random.Next(roomWidthMin, roomWidthMax);
-        int availableWidthX = (width / 2) - roomWidth;
+        int roomWidth = random.Next(roomTemplate.RoomWidthMin, roomTemplate.RoomWidthMax);
+        int availableWidthX = (levelConfig.Width / 2) - roomWidth;
         int randomX = random.Next(0, availableWidthX);
-        int roomX = randomX + (width / 4);
+        int roomX = randomX + (levelConfig.Width / 4);
 
-        int roomLength = random.Next(roomLengthMin, roomLengthMax);
-        int availableLengthY = (length / 2) - roomLength;
+        int roomLength = random.Next(roomTemplate.RoomLengthMin, roomTemplate.RoomLengthMax);
+        int availableLengthY = (levelConfig.Length / 2) - roomLength;
         int randomY = random.Next(0, availableLengthY);
-        int roomY = randomY + (length / 4);
+        int roomY = randomY + (levelConfig.Length / 4);
 
         return new RectInt(roomX, roomY, roomWidth, roomLength);
     }
@@ -100,8 +94,8 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
         var layoutTexture = (Texture2D)renderer.sharedMaterial.mainTexture;
 
-        layoutTexture.Reinitialize(width, length);
-        levelLayouDisplay.transform.localScale = new Vector3(width, length, 1);
+        layoutTexture.Reinitialize(levelConfig.Width, levelConfig.Length);
+        levelLayouDisplay.transform.localScale = new Vector3(levelConfig.Width, levelConfig.Length, 1);
         layoutTexture.FillWithColor(Color.black);
 
         Array.ForEach(level.Rooms, room => layoutTexture.DrawRectangle(room.Area, Color.white));
@@ -143,7 +137,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
     {
         Room room = new Room(roomCandidateRect);
         List<Hallway> candidates = room.CalcualteAllPossibleDoorways(
-            room.Area.width, room.Area.height, doorDistanceFromEdge
+            room.Area.width, room.Area.height, levelConfig.DoorDistanceFromEdge
         );
         HallwayDirection requiredDirection = entryway.StartDirection.GetOppositeDirection();
 
@@ -191,10 +185,11 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
     Room ConstructAdjacentRoom(Hallway selectedEntryway)
     {
+        RoomTemplate roomTemplate = availableRooms.Keys.ElementAt(random.Next(availableRooms.Count));
         RectInt newRoomRect = new()
         {
-            width = random.Next(roomWidthMin, roomWidthMax),
-            height = random.Next(roomLengthMin, roomLengthMax),
+            width = random.Next(roomTemplate.RoomWidthMin, roomTemplate.RoomWidthMax),
+            height = random.Next(roomTemplate.RoomLengthMin, roomTemplate.RoomLengthMax),
         };
 
         Hallway selectedExit = SelectHallwayCandidate(
@@ -206,7 +201,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
         Vector2Int newRoomPosition = CalculateRoomPosition(
             selectedEntryway,
             newRoomRect.width, newRoomRect.height,
-            random.Next(hallwayLengthMin, hallwayLengthMax + 1),
+            random.Next(levelConfig.HallwayLengthMin, levelConfig.HallwayLengthMax + 1),
             selectedExit.StartPosition
         );
 
@@ -217,6 +212,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
             return null;
         }
 
+        UseUpRoomTemplate(roomTemplate);
         Room newRoom = new(newRoomRect);
 
         selectedEntryway.EndRoom = newRoom;
@@ -227,9 +223,10 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
     void AddRooms()
     {
-        while (openDoorways.Count > 0 && level.Rooms.Length < maxRoomCount)
+        while (openDoorways.Count > 0 && level.Rooms.Length < maxRoomCount && availableRooms.Count > 0)
         {
             Hallway selectedEntryway = openDoorways[random.Next(openDoorways.Count)];
+
             Room newRoom = ConstructAdjacentRoom(selectedEntryway);
 
             if (newRoom == null)
@@ -244,7 +241,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
             selectedEntryway.EndRoom = newRoom;
 
             List<Hallway> newOpenHallways = newRoom.CalcualteAllPossibleDoorways(
-                newRoom.Area.width, newRoom.Area.height, doorDistanceFromEdge
+                newRoom.Area.width, newRoom.Area.height, levelConfig.DoorDistanceFromEdge
             );
             newOpenHallways.ForEach(h => h.StartRoom = newRoom);
 
@@ -255,9 +252,9 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
     bool IsRoomCandidateValid(RectInt roomCandidateRect)
     {
-        RectInt levelRect = new(1, 1, width - 2, length - 2);
+        RectInt levelRect = new(1, 1, levelConfig.Width - 2, levelConfig.Length - 2);
         return levelRect.Contains(roomCandidateRect) &&
-            !CheckRoomOverlap(roomCandidateRect, level.Rooms, level.Hallways, minRoomDistance);
+            !CheckRoomOverlap(roomCandidateRect, level.Rooms, level.Hallways, levelConfig.MinRoomDistance);
     }
 
     bool CheckRoomOverlap(
@@ -288,8 +285,11 @@ public class LayoutGeneratorRooms : MonoBehaviour
         return false;
     }
 
-
-
-
+    private void UseUpRoomTemplate(RoomTemplate roomTemplate)
+    {
+        availableRooms[roomTemplate] -= 1;
+        if (availableRooms[roomTemplate] == 0)
+            availableRooms.Remove(roomTemplate);
+    }
 
 }
