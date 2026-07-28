@@ -6653,7 +6653,6 @@ MonoBehaviour:
   levelTexture: {fileID: 2800000, guid: 684003c2074fc5cc2aa5ad8a1deb916a, type: 3}
   generatedLevel: {fileID: 1153271290}
   tileset: {fileID: 11400000, guid: 95242c0acd0b2a6e8bf864b93cfad9ef, type: 2}
-  scale: 1
 --- !u!4 &177802898
 Transform:
   m_ObjectHideFlags: 0
@@ -77226,7 +77225,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd825f4bf399e139cabc9964bb9e75b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 151347811
   levelConfig: {fileID: 11400000, guid: 556df485f4d3347ffabebbcce84a6624, type: 2}
   maxRoomCount: 10
   levelLayouDisplay: {fileID: 881559847}
@@ -77289,6 +77287,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b93d19e4426a4c870b35efb78ea95f3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scale: 1
+  seed: 157773661
 --- !u!1 &1930794948
 GameObject:
   m_ObjectHideFlags: 0
