@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Level : MonoBehaviour
+public class Level
 {
     int width, length;
     List<Room> rooms;
@@ -12,6 +12,7 @@ public class Level : MonoBehaviour
 
     public Room[] Rooms => rooms.ToArray();
     public Hallway[] Hallways => hallways.ToArray();
+    public Room PlayerStartRoom { get; set; }
 
     public Level(int width, int length)
     {

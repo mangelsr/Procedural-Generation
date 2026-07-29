@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = System.Random;
 
@@ -20,7 +19,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
     Dictionary<RoomTemplate, int> availableRooms;
 
     [ContextMenu("Generat Level Layout")]
-    public void GenerateLevel()
+    public Level GenerateLevel()
     {
         SharedLevelData.Instance.ResetRandom();
         random = SharedLevelData.Instance.Rand;
@@ -42,7 +41,6 @@ public class LayoutGeneratorRooms : MonoBehaviour
         {
             h.StartRoom = room;
             openDoorways.Add(h);
-            Debug.Log(h);
         });
         level.AddRoom(room);
 
@@ -51,6 +49,11 @@ public class LayoutGeneratorRooms : MonoBehaviour
         AddRooms();
 
         DrawLayout(selectedEntryway, roomRect);
+        
+        int startRoomIndex = random.Next(level.Rooms.Length);
+        level.PlayerStartRoom = level.Rooms[startRoomIndex];
+    
+        return level;
     }
 
 

@@ -29,7 +29,14 @@ MonoBehaviour:
     roomLengthMin: 10
     roomLengthMax: 15
     layoutTexture: {fileID: 0}
-  doorDistanceFromEdge: 2
-  hallwayLengthMin: 2
+  - name: MediumRoom
+    numberOfRooms: 5
+    roomWidthMin: 4
+    roomWidthMax: 8
+    roomLengthMin: 4
+    roomLengthMax: 8
+    layoutTexture: {fileID: 0}
+  doorDistanceFromEdge: 1
+  hallwayLengthMin: 3
   hallwayLengthMax: 10
-  minRoomDistance: 2
+  minRoomDistance: 3
