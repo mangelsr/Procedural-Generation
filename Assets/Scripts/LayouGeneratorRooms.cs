@@ -141,7 +141,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
         }
 
         layoutTexture.Apply();
-        layoutTexture.SaveAsAsset("LayoutMap");
+        layoutTexture.SaveAsset();
     }
 
     Hallway SelectHallwayCandidate(
