@@ -36,18 +36,13 @@ public class RoomDecorator : MonoBehaviour
         }
 
         TileType[,] levelDecorated = InitializeDecoratorArray();
-        DecorateRoom(levelDecorated, level.Rooms[0], decorationsTransform);
-        GenerateTectureFromTileType(levelDecorated);
 
-    }
-
-    private void DecorateRoom(TileType[,] levelDecorated, Room room, Transform decorationsTransform)
-    {
-        BaseDecoratorRule selectedRule = availableRules[0];
-        if (selectedRule.CanBeApplied(levelDecorated, room))
+        foreach (Room room in level.Rooms)
         {
-            selectedRule.Apply(levelDecorated, room, decorationsTransform);
+            DecorateRoom(levelDecorated, room, decorationsTransform);
         }
+
+        GenerateTectureFromTileType(levelDecorated);
     }
 
     private TileType[,] InitializeDecoratorArray()
@@ -91,5 +86,15 @@ public class RoomDecorator : MonoBehaviour
         decoratedTexture.SetPixels32(pixels);
         decoratedTexture.Apply();
         decoratedTexture.SaveAsset();
+    }
+
+    private void DecorateRoom(TileType[,] levelDecorated, Room room, Transform decorationsTransform)
+    {
+        int selectedRuleIndex = random.Next(availableRules.Length);
+        BaseDecoratorRule selectedRule = availableRules[selectedRuleIndex];
+        if (selectedRule.CanBeApplied(levelDecorated, room))
+        {
+            selectedRule.Apply(levelDecorated, room, decorationsTransform);
+        }
     }
 }

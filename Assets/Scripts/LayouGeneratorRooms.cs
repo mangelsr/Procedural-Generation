@@ -49,10 +49,10 @@ public class LayoutGeneratorRooms : MonoBehaviour
         AddRooms();
 
         DrawLayout(selectedEntryway, roomRect);
-        
+
         int startRoomIndex = random.Next(level.Rooms.Length);
         level.PlayerStartRoom = level.Rooms[startRoomIndex];
-    
+
         return level;
     }
 
@@ -98,9 +98,13 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
         var layoutTexture = (Texture2D)renderer.sharedMaterial.mainTexture;
 
+        int scale = SharedLevelData.Instance.Scale;
         layoutTexture.Reinitialize(levelConfig.Width, levelConfig.Length);
-        levelLayouDisplay.transform.localScale = new Vector3(levelConfig.Width, levelConfig.Length, 1);
+        levelLayouDisplay.transform.localScale = new Vector3(levelConfig.Width * scale, levelConfig.Length * scale, 1);
         layoutTexture.FillWithColor(Color.black);
+        float xPos = level.Width * scale / 2.0f - scale;
+        float zPos = level.Length * scale / 2.0f - scale;
+        levelLayouDisplay.transform.position = new Vector3(xPos, 0 , zPos);
 
         Array.ForEach(level.Rooms, room =>
         {
@@ -129,8 +133,6 @@ public class LayoutGeneratorRooms : MonoBehaviour
             }
         }
 
-
-
         if (isDebug && selectedEntryway != null)
         {
             layoutTexture.SetPixel(
@@ -145,7 +147,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
     }
 
     Hallway SelectHallwayCandidate(
-        RectInt roomCandidateRect, RoomTemplate roomTemplate, 
+        RectInt roomCandidateRect, RoomTemplate roomTemplate,
         Hallway entryway)
     {
         Room room = CreateNewRoom(roomCandidateRect, roomTemplate, false);
@@ -304,7 +306,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
             availableRooms.Remove(roomTemplate);
     }
 
-    Room CreateNewRoom(RectInt roomCandidateRect, 
+    Room CreateNewRoom(RectInt roomCandidateRect,
         RoomTemplate roomTemplate, bool useUp = true)
     {
         if (useUp)
