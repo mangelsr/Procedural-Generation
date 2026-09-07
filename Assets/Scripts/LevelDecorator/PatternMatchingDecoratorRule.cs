@@ -32,10 +32,10 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
         }
 
         GameObject decoration = Instantiate(prefab, parent.transform);
-        Vector3 center = new(occurrence.x + placement.Width / 2, 0, occurrence.y + placement.Width / 2);
+        Vector3 center = new(occurrence.x, 0, occurrence.y);
         int scale = SharedLevelData.Instance.Scale;
 
-        decoration.transform.position = (center + new Vector3(-1, 0, -1)) * scale;
+        decoration.transform.position = (center + new Vector3(0.25f, 0, 0.25f)) * scale;
         decoration.transform.localScale = Vector3.one * scale;
     }
 
