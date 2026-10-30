@@ -10,7 +10,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
     [SerializeField] RoomLevelLayoutConfig levelConfig;
     [SerializeField] int maxRoomCount = 10;
 
-    [SerializeField] GameObject levelLayouDisplay;
+    [SerializeField] GameObject levelLayoutDisplay;
 
     [SerializeField] List<Hallway> openDoorways;
 
@@ -94,17 +94,17 @@ public class LayoutGeneratorRooms : MonoBehaviour
         bool isDebug = false
     )
     {
-        var renderer = levelLayouDisplay.GetComponent<Renderer>();
+        var renderer = levelLayoutDisplay.GetComponent<Renderer>();
 
         var layoutTexture = (Texture2D)renderer.sharedMaterial.mainTexture;
 
         int scale = SharedLevelData.Instance.Scale;
         layoutTexture.Reinitialize(levelConfig.Width, levelConfig.Length);
-        levelLayouDisplay.transform.localScale = new Vector3(levelConfig.Width * scale, levelConfig.Length * scale, 1);
+        levelLayoutDisplay.transform.localScale = new Vector3(levelConfig.Width * scale, levelConfig.Length * scale, 1);
         layoutTexture.FillWithColor(Color.black);
         float xPos = level.Width * scale / 2.0f - scale;
         float zPos = level.Length * scale / 2.0f - scale;
-        levelLayouDisplay.transform.position = new Vector3(xPos, 0 , zPos);
+        levelLayoutDisplay.transform.position = new Vector3(xPos, 0 , zPos);
 
         Array.ForEach(level.Rooms, room =>
         {
