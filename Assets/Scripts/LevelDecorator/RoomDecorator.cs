@@ -1,5 +1,24 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+
 using UnityEngine;
 using Random = System.Random;
+using System.Data;
+
+
+[Serializable]
+public class RuleAvailability
+{
+    public BaseDecoratorRule rule;
+    public int maxAvailability;
+
+    public RuleAvailability(RuleAvailability other)
+    {
+        rule = other.rule;
+        maxAvailability = other.maxAvailability;
+    }
+}
 
 public class RoomDecorator : MonoBehaviour
 {
@@ -7,7 +26,7 @@ public class RoomDecorator : MonoBehaviour
     [SerializeField] LayoutGeneratorRooms layoutGenerator;
     [SerializeField] Texture2D levelTexture;
     [SerializeField] Texture2D decoratedTexture;
-    [SerializeField] BaseDecoratorRule[] availableRules;
+    [SerializeField] RuleAvailability[] availableRules;
 
     Random random;
 
@@ -90,11 +109,43 @@ public class RoomDecorator : MonoBehaviour
 
     private void DecorateRoom(TileType[,] levelDecorated, Room room, Transform decorationsTransform)
     {
-        int selectedRuleIndex = random.Next(availableRules.Length);
-        BaseDecoratorRule selectedRule = availableRules[selectedRuleIndex];
-        if (selectedRule.CanBeApplied(levelDecorated, room))
+        int currentTries = 0;
+        int maxTries = 50;
+
+        int currentNumberOfDecorations = 0;
+        int maxNumberOfDecorations = room.Area.width * room.Area.height;
+
+        List<RuleAvailability> availableRulesForRoom = CopyRuleAvailability();
+
+        while (currentNumberOfDecorations < maxNumberOfDecorations
+                && currentTries < maxTries
+                && availableRulesForRoom.Count > 0
+            )
         {
-            selectedRule.Apply(levelDecorated, room, decorationsTransform);
+            int selectedRuleIndex = random.Next(availableRulesForRoom.Count);
+            RuleAvailability selectedRuleAvailability = availableRulesForRoom[selectedRuleIndex];
+            BaseDecoratorRule selectedRule = selectedRuleAvailability.rule;
+
+            if (selectedRule.CanBeApplied(levelDecorated, room))
+            {
+                selectedRule.Apply(levelDecorated, room, decorationsTransform);
+                currentNumberOfDecorations++;
+
+                if (selectedRuleAvailability.maxAvailability > 0)
+                    selectedRuleAvailability.maxAvailability--;
+
+                if (selectedRuleAvailability.maxAvailability == 0)
+                    availableRulesForRoom.Remove(selectedRuleAvailability);
+            }
+
+            currentTries++;
         }
+    }
+
+    private List<RuleAvailability> CopyRuleAvailability()
+    {
+        List<RuleAvailability> availableRulesForRoom = new();
+        availableRules.ToList().ForEach(original => availableRulesForRoom.Add(new RuleAvailability(original)));
+        return availableRulesForRoom;
     }
 }

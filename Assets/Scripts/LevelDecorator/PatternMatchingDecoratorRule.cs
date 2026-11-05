@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 using Random = System.Random;
 
@@ -8,8 +9,12 @@ using Random = System.Random;
 public class PatternMatchingDecoratorRule : BaseDecoratorRule
 {
     [SerializeField] GameObject prefab;
+    [SerializeField] float prefabRotation = 0.0f;
     [SerializeField] Array2DWrapper<TileType> placement;
     [SerializeField] Array2DWrapper<TileType> fill;
+    [SerializeField] bool centerHorizontally = false;
+    [SerializeField] bool centerVertically = false;
+
 
     internal override void Apply(TileType[,] levelDecorated, Room room, Transform parent)
     {
@@ -32,6 +37,10 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
         }
 
         GameObject decoration = Instantiate(prefab, parent.transform);
+        
+        Vector3 currentRotation = decoration.transform.eulerAngles;
+        decoration.transform.eulerAngles = currentRotation + new Vector3(0, prefabRotation, 0);
+        
         Vector3 center = new(occurrence.x, 0, occurrence.y);
         int scale = SharedLevelData.Instance.Scale;
 
@@ -47,10 +56,17 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
     private Vector2Int[] FindOccurences(TileType[,] levelDecorated, Room room)
     {
         List<Vector2Int> occurences = new();
+
+        float centerX = room.Area.position.x + room.Area.width / 2.0f - placement.Width / 2.0f;
+        float centerY = room.Area.position.y + room.Area.height / 2.0f - placement.Height / 2.0f;
+
         for (int y = room.Area.position.y - 1; y < room.Area.position.y + room.Area.height + 2 - placement.Height; y++)
         {
             for (int x = room.Area.position.x - 1; x < room.Area.position.x + room.Area.width + 2 - placement.Width; x++)
             {
+                if (centerHorizontally && x != centerX) continue;
+                if (centerVertically && y != centerY) continue;
+
                 if (IsPatternAtPosition(levelDecorated, placement, x, y))
                 {
                     occurences.Add(new Vector2Int(x, y));
