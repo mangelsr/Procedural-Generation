@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CornerDecoratorRotated
   m_EditorClassIdentifier: 
   prefab: {fileID: 2439218787056973520, guid: af76cd76a9939766984868e68b18e16c, type: 3}
-  prefabRotation: 180
+  prefabRotation: 90
   placement:
     array: 04000000020000000400000004000000
     width: 2
@@ -24,3 +24,4 @@ MonoBehaviour:
     height: 2
   centerHorizontally: 0
   centerVertically: 0
+  decorationOffset: {x: 0, y: 1.5}
