@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: BarrelOnWall
   m_EditorClassIdentifier: Assembly-CSharp::PatternMatchingDecoratorRule
-  prefab: {fileID: 2660337167943546739, guid: 89041a4e615f6c64ea4acbb8f05c5e6a, type: 3}
+  prefab: {fileID: 8575782165780852804, guid: 61e265c11cf257a62a47a23378663470, type: 3}
+  prefabRotation: 0
   placement:
     array: 040000000400000004000000020000000200000002000000
     width: 3

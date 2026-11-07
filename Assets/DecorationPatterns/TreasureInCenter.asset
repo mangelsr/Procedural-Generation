@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: TreasureInCenter
   m_EditorClassIdentifier: Assembly-CSharp::PatternMatchingDecoratorRule
-  prefab: {fileID: 9043201968713845679, guid: 7f49de4a1f6f62d4f8b2e1a2cf5bae58, type: 3}
+  prefab: {fileID: 5542719257557740317, guid: adb2ba8829e0fffd0861e579d73b8889, type: 3}
+  prefabRotation: 0
   placement:
     array: 020000000200000002000000020000000200000002000000020000000200000002000000
     width: 3

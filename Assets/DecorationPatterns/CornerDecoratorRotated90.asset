@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
-  m_Name: CornerDecoratorRotated
+  m_Name: CornerDecoratorRotated90
   m_EditorClassIdentifier: 
   prefab: {fileID: 2439218787056973520, guid: af76cd76a9939766984868e68b18e16c, type: 3}
   prefabRotation: 90

@@ -44,7 +44,7 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
         Vector3 center = new(occurrence.x, 0, occurrence.y);
         int scale = SharedLevelData.Instance.Scale;
 
-        decoration.transform.position = (center + new Vector3(0.25f, 0, 0.25f)) * scale;
+        decoration.transform.position = center  * scale;
         decoration.transform.localScale = Vector3.one * scale;
     }
 
