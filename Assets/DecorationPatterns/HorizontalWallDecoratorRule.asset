@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: HorizontalWallDecoratorRule
   m_EditorClassIdentifier: 
   prefab: {fileID: 39539218994431968, guid: 62e4c1a21cbe84f11a37951140c91b93, type: 3}
+  prefabRotation: 0
   placement:
-    array: 020000000200000002000000040000000400000004000000
+    array: 000000000200000000000000040000000400000004000000
     width: 3
     height: 2
   fill:
-    array: 020000000200000002000000050000000500000005000000
+    array: 000000000200000000000000050000000500000005000000
     width: 3
     height: 2
+  centerHorizontally: 0
+  centerVertically: 0

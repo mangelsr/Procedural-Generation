@@ -32,19 +32,20 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
             for (int x = 0; x < placement.Width; x++)
             {
                 TileType tileType = fill[x, y];
-                levelDecorated[occurrence.x + x, occurrence.y + y] = tileType;
+                if (!TileType.Noop.Equals(tileType))
+                    levelDecorated[occurrence.x + x, occurrence.y + y] = tileType;
             }
         }
 
         GameObject decoration = Instantiate(prefab, parent.transform);
-        
+
         Vector3 currentRotation = decoration.transform.eulerAngles;
         decoration.transform.eulerAngles = currentRotation + new Vector3(0, prefabRotation, 0);
-        
+
         Vector3 center = new(occurrence.x, 0, occurrence.y);
         int scale = SharedLevelData.Instance.Scale;
 
-        decoration.transform.position = center  * scale;
+        decoration.transform.position = center * scale;
         decoration.transform.localScale = Vector3.one * scale;
     }
 
@@ -82,7 +83,10 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
         {
             for (int x = 0; x < pattern.Width; x++)
             {
-                if (levelDecorated[startX + x, startY + y] != pattern[x, y])
+                if (
+                    !TileType.Noop.Equals(pattern[x, y]) &&
+                    levelDecorated[startX + x, startY + y] != pattern[x, y]
+                )
                 {
                     return false;
                 }
