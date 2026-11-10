@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using UnityEngine;
 using Random = System.Random;
 
@@ -47,6 +46,10 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
 
         decoration.transform.position = center * scale;
         decoration.transform.localScale = Vector3.one * scale;
+
+        PropVariationGenerator variationGenerator = decoration.GetComponent<PropVariationGenerator>();
+        if (variationGenerator != null)
+            variationGenerator.GenerateVariation();        
     }
 
     internal override bool CanBeApplied(TileType[,] levelDecorated, Room room)
