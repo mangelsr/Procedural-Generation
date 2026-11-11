@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TileType { Noop, Empty, Floor, BlockedFloor, Wall, DecoratedWall, Item }
+public enum TileType { Noop, Empty, Floor, BlockedFloor, Wall, DecoratedWall, Item, Doorway }
 
 public static class TileTypeExtension
 {
@@ -11,7 +11,8 @@ public static class TileTypeExtension
         { TileType.Floor, Color.white },
         { TileType.Item, Color.blue },
         { TileType.BlockedFloor, Color.red },
-        { TileType.DecoratedWall, Color.yellow }
+        { TileType.DecoratedWall, Color.yellow },
+        { TileType.Doorway, Color.cyan }
     };
 
     public static Color GetColor(this TileType tileType)

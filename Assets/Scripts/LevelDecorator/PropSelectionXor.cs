@@ -8,14 +8,17 @@ public class PropSelectionXor : MonoBehaviour
     [ContextMenu("GenerateVariation")]
     public void GenerateVariation()
     {
+        if (gameObjects == null || gameObjects.Length == 0) return;
         Random random = SharedLevelData.Instance.Rand;
         foreach (GameObject gameObject in gameObjects)
         {
-            gameObject.SetActive(false);
+            if (gameObject != null)
+                gameObject.SetActive(false);
         }
         int selectedIndex = random.Next(0, gameObjects.Length);
         GameObject selectedGameObject = gameObjects[selectedIndex];
-        selectedGameObject.SetActive(true);
+        if (selectedGameObject != null)
+            selectedGameObject.SetActive(true);
     }
 
 }

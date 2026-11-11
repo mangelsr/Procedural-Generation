@@ -53,7 +53,7 @@ public class RoomDecorator : MonoBehaviour
             decorationsTransform.DestroyAllChildren();
         }
 
-        TileType[,] levelDecorated = InitializeDecoratorArray();
+        TileType[,] levelDecorated = InitializeDecoratorArray(level);
 
         foreach (Room room in level.Rooms)
         {
@@ -63,13 +63,13 @@ public class RoomDecorator : MonoBehaviour
         GenerateTectureFromTileType(levelDecorated);
     }
 
-    private TileType[,] InitializeDecoratorArray()
+    private TileType[,] InitializeDecoratorArray(Level level = null)
     {
         TileType[,] levelDecorated = new TileType[levelTexture.width, levelTexture.height];
 
         for (int y = levelTexture.height - 1; y >= 0; y--)
         {
-            for (int x = 0; x < levelTexture.width - 1; x++)
+            for (int x = 0; x < levelTexture.width; x++)
             {
                 Color pixelColor = levelTexture.GetPixel(x, y);
                 if (pixelColor == Color.black)
@@ -83,7 +83,27 @@ public class RoomDecorator : MonoBehaviour
             }
         }
 
+        if (level != null && level.Hallways != null)
+        {
+            foreach (Hallway hallway in level.Hallways)
+            {
+                MarkDoorwayTile(levelDecorated, hallway.StartPositionAbsolute);
+                MarkDoorwayTile(levelDecorated, hallway.EndPositionAbsolute);
+            }
+        }
+
         return levelDecorated;
+    }
+
+    private void MarkDoorwayTile(TileType[,] levelDecorated, Vector2Int pos)
+    {
+        if (pos.x >= 0 && pos.y >= 0 && pos.x < levelDecorated.GetLength(0) && pos.y < levelDecorated.GetLength(1))
+        {
+            if (levelDecorated[pos.x, pos.y] == TileType.Floor)
+            {
+                levelDecorated[pos.x, pos.y] = TileType.Doorway;
+            }
+        }
     }
 
     private void GenerateTectureFromTileType(TileType[,] tileTypes)

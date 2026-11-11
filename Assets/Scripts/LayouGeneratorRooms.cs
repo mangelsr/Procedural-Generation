@@ -74,14 +74,14 @@ public class LayoutGeneratorRooms : MonoBehaviour
         RectInt roomSize = roomTemplate.GenerateRoomCandidateRect(random);
 
         int roomWidth = roomSize.width;
-        int availableWidthX = (levelConfig.Width / 2) - roomWidth;
+        int availableWidthX = Math.Max(1, (levelConfig.Width / 2) - roomWidth);
         int randomX = random.Next(0, availableWidthX);
-        int roomX = randomX + (levelConfig.Width / 4);
+        int roomX = Mathf.Clamp(randomX + (levelConfig.Width / 4), 1, Math.Max(1, levelConfig.Width - roomWidth - 1));
 
         int roomLength = roomSize.height;
-        int availableLengthY = (levelConfig.Length / 2) - roomLength;
+        int availableLengthY = Math.Max(1, (levelConfig.Length / 2) - roomLength);
         int randomY = random.Next(0, availableLengthY);
-        int roomY = randomY + (levelConfig.Length / 4);
+        int roomY = Mathf.Clamp(randomY + (levelConfig.Length / 4), 1, Math.Max(1, levelConfig.Length - roomLength - 1));
 
         return new RectInt(roomX, roomY, roomWidth, roomLength);
     }
@@ -92,14 +92,17 @@ public class LayoutGeneratorRooms : MonoBehaviour
         bool isDebug = false
     )
     {
+        if (levelLayoutDisplay == null) return;
         var renderer = levelLayoutDisplay.GetComponent<Renderer>();
+        if (renderer == null || renderer.sharedMaterial == null) return;
 
         var layoutTexture = (Texture2D)renderer.sharedMaterial.mainTexture;
+        if (layoutTexture == null) return;
 
         int scale = SharedLevelData.Instance.Scale;
         layoutTexture.Reinitialize(levelConfig.Width, levelConfig.Length);
         levelLayoutDisplay.transform.localScale = new Vector3(levelConfig.Width * scale, levelConfig.Length * scale, 1);
-        layoutTexture.FillWithColor(Color.black);
+        layoutTexture.FillWithColor(Color.black, apply: false);
         float xPos = level.Width * scale / 2.0f - scale;
         float zPos = level.Length * scale / 2.0f - scale;
         levelLayoutDisplay.transform.position = new Vector3(xPos, 0, zPos);
@@ -107,22 +110,22 @@ public class LayoutGeneratorRooms : MonoBehaviour
         Array.ForEach(level.Rooms, room =>
         {
             if (room.LayoutTexture != null)
-                layoutTexture.DrawTexture(room.LayoutTexture, room.Area);
+                layoutTexture.DrawTexture(room.LayoutTexture, room.Area, apply: false);
             else
-                layoutTexture.DrawRectangle(room.Area, Color.white);
+                layoutTexture.DrawRectangle(room.Area, Color.white, apply: false);
 
             Debug.Log($"{room.Area} {room.Conectedness} {room.Type}");
         });
         Array.ForEach(level.Hallways,
             hallway => layoutTexture.DrawLine(
-                hallway.StartPositionAbsolute, hallway.EndPositionAbsolute, Color.white
+                hallway.StartPositionAbsolute, hallway.EndPositionAbsolute, Color.white, apply: false
             )
         );
-        layoutTexture.ConvertToBlackAndWhite();
+        layoutTexture.ConvertToBlackAndWhite(apply: false);
 
         if (isDebug)
         {
-            layoutTexture.DrawRectangle(roomCandidateRect, Color.blue);
+            layoutTexture.DrawRectangle(roomCandidateRect, Color.blue, apply: false);
             foreach (Hallway hallway in openDoorways)
             {
                 layoutTexture.SetPixel(
@@ -200,39 +203,42 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
     Room ConstructAdjacentRoom(Hallway selectedEntryway)
     {
-        RoomTemplate roomTemplate = availableRooms.Keys.ElementAt(random.Next(availableRooms.Count));
-        RectInt newRoomRect = new()
+        const int maxCandidateTries = 4;
+
+        for (int attempt = 0; attempt < maxCandidateTries && availableRooms.Count > 0; attempt++)
         {
-            width = random.Next(roomTemplate.RoomWidthMin, roomTemplate.RoomWidthMax),
-            height = random.Next(roomTemplate.RoomLengthMin, roomTemplate.RoomLengthMax),
-        };
+            RoomTemplate roomTemplate = availableRooms.Keys.ElementAt(random.Next(availableRooms.Count));
+            RectInt newRoomRect = roomTemplate.GenerateRoomCandidateRect(random);
 
-        Hallway selectedExit = SelectHallwayCandidate(
-            newRoomRect, roomTemplate, selectedEntryway
-        );
+            Hallway selectedExit = SelectHallwayCandidate(
+                newRoomRect, roomTemplate, selectedEntryway
+            );
 
-        if (selectedExit == null) return null;
+            if (selectedExit == null) continue;
 
-        Vector2Int newRoomPosition = CalculateRoomPosition(
-            selectedEntryway,
-            newRoomRect.width, newRoomRect.height,
-            random.Next(levelConfig.HallwayLengthMin, levelConfig.HallwayLengthMax + 1),
-            selectedExit.StartPosition
-        );
+            Vector2Int newRoomPosition = CalculateRoomPosition(
+                selectedEntryway,
+                newRoomRect.width, newRoomRect.height,
+                random.Next(levelConfig.HallwayLengthMin, levelConfig.HallwayLengthMax + 1),
+                selectedExit.StartPosition
+            );
 
-        newRoomRect.position = newRoomPosition;
+            newRoomRect.position = newRoomPosition;
 
-        if (!IsRoomCandidateValid(newRoomRect))
-        {
-            return null;
+            if (!IsRoomCandidateValid(newRoomRect))
+            {
+                continue;
+            }
+
+            Room newRoom = CreateNewRoom(newRoomRect, roomTemplate);
+
+            selectedEntryway.EndRoom = newRoom;
+            selectedEntryway.EndPosition = selectedExit.StartPosition;
+
+            return newRoom;
         }
 
-        Room newRoom = CreateNewRoom(newRoomRect, roomTemplate);
-
-        selectedEntryway.EndRoom = newRoom;
-        selectedEntryway.EndPosition = selectedExit.StartPosition;
-
-        return newRoom;
+        return null;
     }
 
     void AddRooms()
@@ -347,24 +353,41 @@ public class LayoutGeneratorRooms : MonoBehaviour
 
     void AssignRoomTypes()
     {
+        if (level.Rooms.Length == 0) return;
+
         List<Room> borderRooms = level.Rooms
             .Where(room => room.Conectedness == 1)
             .ToList();
 
-        if (borderRooms.Count < 2) return;
+        Room startRoom;
+        if (borderRooms.Count > 0)
+        {
+            int startRoomIndex = random.Next(borderRooms.Count);
+            startRoom = borderRooms[startRoomIndex];
+            borderRooms.Remove(startRoom);
+        }
+        else
+        {
+            startRoom = level.Rooms[random.Next(level.Rooms.Length)];
+        }
 
-        int startRoomIndex = random.Next(borderRooms.Count);
-        Room startRoom = borderRooms[startRoomIndex];
         level.PlayerStartRoom = startRoom;
         startRoom.Type = RoomType.Start;
-        borderRooms.Remove(startRoom);
 
-        Room farthestRoom = borderRooms
+        List<Room> exitCandidates = borderRooms.Count > 0
+            ? borderRooms
+            : level.Rooms.Where(room => room != startRoom).ToList();
+
+        Room farthestRoom = exitCandidates
             .OrderByDescending(
                 room => Vector2.Distance(startRoom.Area.center, room.Area.center)
             ).FirstOrDefault();
-        farthestRoom.Type = RoomType.Exit;
-        borderRooms.Remove(farthestRoom);
+
+        if (farthestRoom != null)
+        {
+            farthestRoom.Type = RoomType.Exit;
+            borderRooms.Remove(farthestRoom);
+        }
 
         List<Room> treasureRooms = borderRooms
             .OrderBy(_ => random.Next())
@@ -378,24 +401,27 @@ public class LayoutGeneratorRooms : MonoBehaviour
         List<Room> emptyRooms = level.Rooms
             .Where(room => room.Type.HasFlag(RoomType.Default))
             .ToList();
-          
-        Room boosRoom = emptyRooms
-            .OrderByDescending(
+
+        Room bossRoom = emptyRooms
+            .OrderByDescending(room => room.Conectedness)
+            .ThenByDescending(room => room.Area.width * room.Area.height)
+            .ThenByDescending(
                 room => Vector2.Distance(
                     startRoom.Area.center, room.Area.center
                 )
             )
-            .OrderByDescending(room => room.Conectedness)
-            .OrderByDescending(room => room.Area.width * room.Area.height)
             .FirstOrDefault();
-        
-        boosRoom.Type = RoomType.Boss;
-        emptyRooms.Remove(boosRoom);
+
+        if (bossRoom != null)
+        {
+            bossRoom.Type = RoomType.Boss;
+            emptyRooms.Remove(bossRoom);
+        }
 
         emptyRooms = emptyRooms.OrderBy(_ => random.Next()).ToList();
-        
+
         RoomType[] typesToAssign = { RoomType.Prision, RoomType.Library, RoomType.Garden };
-        
+
         List<Room> roomsToAssign = emptyRooms.Take(typesToAssign.Length).ToList();
 
         for (int i = 0; i < roomsToAssign.Count; i++)

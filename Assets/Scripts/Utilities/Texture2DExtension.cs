@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.IO;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public static class Texture2DExtension
 {
@@ -30,10 +32,13 @@ public static class Texture2DExtension
     /// <param name="texture">A texture that is already an asset in the project. If the texture is not an asset the method will fail.</param>
     public static void SaveAsset(this Texture2D texture)
     {
-        var bytes = texture.EncodeToPNG();
+#if UNITY_EDITOR
         var assetPath = AssetDatabase.GetAssetPath(texture);
+        if (string.IsNullOrEmpty(assetPath)) return;
+        var bytes = texture.EncodeToPNG();
         File.WriteAllBytes(assetPath, bytes);
         AssetDatabase.Refresh();
+#endif
     }
 
     /// <summary>
@@ -43,14 +48,19 @@ public static class Texture2DExtension
     /// <param name="path">Path relative to the Assets folder. For example: "MyFolder/texture". This will save the texture in "Assets/MyFolder/texture.png"</param>
     public static void SaveAsAsset(this Texture2D texture, string path)
     {
+#if UNITY_EDITOR
         var bytes = texture.EncodeToPNG();
         var assetPath = "Assets/" + path + ".png";
         File.WriteAllBytes(assetPath, bytes);
         AssetDatabase.Refresh();
         var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
-        importer.isReadable = texture.isReadable;
-        importer.mipmapEnabled = false;
-        importer.SaveAndReimport();
+        if (importer != null)
+        {
+            importer.isReadable = texture.isReadable;
+            importer.mipmapEnabled = false;
+            importer.SaveAndReimport();
+        }
+#endif
     }
 
     public static Texture2D Copy(this Texture2D texture)
@@ -70,24 +80,29 @@ public static class Texture2DExtension
         return copiedTexture;
     }
 
-    public static void FillWithColor(this Texture2D texture, Color color)
+    public static void FillWithColor(this Texture2D texture, Color color, bool apply = true)
     {
-        texture.DrawRectangle(new RectInt(0, 0, texture.width, texture.height), color);
+        texture.DrawRectangle(new RectInt(0, 0, texture.width, texture.height), color, apply);
     }
 
-    public static void DrawRectangle(this Texture2D texture, RectInt rect, Color color)
+    public static void DrawRectangle(this Texture2D texture, RectInt rect, Color color, bool apply = true)
     {
-        for (int y = rect.yMin; y < rect.yMax; y++)
+        int startX = Mathf.Max(0, rect.xMin);
+        int startY = Mathf.Max(0, rect.yMin);
+        int endX = Mathf.Min(rect.xMax, texture.width);
+        int endY = Mathf.Min(rect.yMax, texture.height);
+
+        for (int y = startY; y < endY; y++)
         {
-            for (int x = rect.xMin; x < rect.xMax; x++)
+            for (int x = startX; x < endX; x++)
             {
                 texture.SetPixel(x, y, color);
             }
         }
-        texture.Apply();
+        if (apply) texture.Apply();
     }
 
-    public static void DrawTexture(this Texture2D texture, Texture2D sourceTexture, RectInt destinationRect)
+    public static void DrawTexture(this Texture2D texture, Texture2D sourceTexture, RectInt destinationRect, bool apply = true)
     {
         int startX = Mathf.Max(0, destinationRect.x);
         int startY = Mathf.Max(0, destinationRect.y);
@@ -103,14 +118,14 @@ public static class Texture2DExtension
             }
         }
 
-        texture.Apply();
+        if (apply) texture.Apply();
     }
 
     /// <summary>
     /// Converts a Texture2D to black and white where every pixel is white unless it is already black in the original.
     /// </summary>
     /// <param name="original">The original Texture2D to convert.</param>
-    public static void ConvertToBlackAndWhite(this Texture2D texture)
+    public static void ConvertToBlackAndWhite(this Texture2D texture, bool apply = true)
     {
         Color[] pixels = texture.GetPixels();
         for (int i = 0; i < pixels.Length; i++)
@@ -121,10 +136,10 @@ public static class Texture2DExtension
             }
         }
         texture.SetPixels(pixels);
-        texture.Apply();
+        if (apply) texture.Apply();
     }
 
-    public static void DrawLine(this Texture2D texture, Vector2Int p0, Vector2Int p1, Color color)
+    public static void DrawLine(this Texture2D texture, Vector2Int p0, Vector2Int p1, Color color, bool apply = true)
     {
         int dx = Mathf.Abs(p1.x - p0.x);
         int dy = Mathf.Abs(p1.y - p0.y);
@@ -156,7 +171,7 @@ public static class Texture2DExtension
         }
 
         texture.SetPixel(p0.x, p0.y, color);
-        texture.Apply();
+        if (apply) texture.Apply();
     }
 
 }

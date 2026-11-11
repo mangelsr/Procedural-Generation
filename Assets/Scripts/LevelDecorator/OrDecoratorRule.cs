@@ -13,9 +13,10 @@ public class OrDecoratorRule : BaseDecoratorRule
 
     internal override bool CanBeApplied(TileType[,] levelDecorated, Room room)
     {
+        if (childRules == null) return false;
         foreach (BaseDecoratorRule rule in childRules)
         {
-            if (rule.CanBeApplied(levelDecorated, room))
+            if (rule != null && rule.CanBeApplied(levelDecorated, room))
                 return true;
         }
         return false;
@@ -23,12 +24,15 @@ public class OrDecoratorRule : BaseDecoratorRule
 
     internal override void Apply(TileType[,] levelDecorator, Room room, Transform parent)
     {
+        if (childRules == null) return;
         List<BaseDecoratorRule> applicableChildRules = new();
         foreach (BaseDecoratorRule rule in childRules)
         {
-            if (rule.CanBeApplied(levelDecorator, room))
+            if (rule != null && rule.CanBeApplied(levelDecorator, room))
                 applicableChildRules.Add(rule);
         }
+        if (applicableChildRules.Count == 0) return;
+
         Random random = SharedLevelData.Instance.Rand;
         int randomIndex = random.Next(0, applicableChildRules.Count);
         BaseDecoratorRule selectedRule = applicableChildRules[randomIndex];

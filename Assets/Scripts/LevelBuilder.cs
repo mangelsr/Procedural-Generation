@@ -1,7 +1,6 @@
 using UnityEngine;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
-using NUnit.Framework;
 
 public class LevelBuilder : MonoBehaviour
 {
@@ -31,12 +30,16 @@ public class LevelBuilder : MonoBehaviour
         roomDecorator.PlaceItems(level);
         navMeshSurface.BuildNavMesh();
 
-        Room startRoom = level.PlayerStartRoom;
+        Room startRoom = level.PlayerStartRoom ?? (level.Rooms.Length > 0 ? level.Rooms[0] : null);
+        if (startRoom == null) return;
+
         Vector2 roomCenter = startRoom.Area.center;
 
         Vector3 playerPosition = levelPositionToWorldPosition(roomCenter);
         
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
         NavMeshAgent playerNavMeshAgent = player.GetComponent<NavMeshAgent>();
         
         if (playerNavMeshAgent == null)

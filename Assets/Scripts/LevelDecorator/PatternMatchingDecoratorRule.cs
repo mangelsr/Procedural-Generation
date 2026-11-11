@@ -36,6 +36,8 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
             }
         }
 
+        if (prefab == null) return;
+
         GameObject decoration = Instantiate(prefab, parent.transform);
 
         Vector3 currentRotation = decoration.transform.eulerAngles;
@@ -61,8 +63,8 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
     {
         List<Vector2Int> occurences = new();
 
-        float centerX = room.Area.position.x + room.Area.width / 2.0f - placement.Width / 2.0f;
-        float centerY = room.Area.position.y + room.Area.height / 2.0f - placement.Height / 2.0f;
+        int centerX = Mathf.RoundToInt(room.Area.position.x + (room.Area.width - placement.Width) / 2.0f);
+        int centerY = Mathf.RoundToInt(room.Area.position.y + (room.Area.height - placement.Height) / 2.0f);
 
         for (int y = room.Area.position.y - 1; y < room.Area.position.y + room.Area.height + 2 - placement.Height; y++)
         {
@@ -82,13 +84,24 @@ public class PatternMatchingDecoratorRule : BaseDecoratorRule
 
     private bool IsPatternAtPosition(TileType[,] levelDecorated, Array2DWrapper<TileType> pattern, int startX, int startY)
     {
+        int maxX = levelDecorated.GetLength(0);
+        int maxY = levelDecorated.GetLength(1);
+
         for (int y = 0; y < pattern.Height; y++)
         {
             for (int x = 0; x < pattern.Width; x++)
             {
+                int targetX = startX + x;
+                int targetY = startY + y;
+
+                if (targetX < 0 || targetY < 0 || targetX >= maxX || targetY >= maxY)
+                {
+                    return false;
+                }
+
                 if (
                     !TileType.Noop.Equals(pattern[x, y]) &&
-                    levelDecorated[startX + x, startY + y] != pattern[x, y]
+                    levelDecorated[targetX, targetY] != pattern[x, y]
                 )
                 {
                     return false;

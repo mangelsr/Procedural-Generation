@@ -9,9 +9,10 @@ public class AndDecoratorRule : BaseDecoratorRule
 
     internal override bool CanBeApplied(TileType[,] levelDecorated, Room room)
     {
+        if (childRules == null || childRules.Length == 0) return false;
         foreach (BaseDecoratorRule rule in childRules)
         {
-            if (!rule.CanBeApplied(levelDecorated, room))
+            if (rule == null || !rule.CanBeApplied(levelDecorated, room))
                 return false;
         }
         return true;
@@ -20,9 +21,13 @@ public class AndDecoratorRule : BaseDecoratorRule
 
     internal override void Apply(TileType[,] levelDecorator, Room room, Transform parent)
     {
+        if (childRules == null) return;
         foreach (BaseDecoratorRule rule in childRules)
         {
-            rule.Apply(levelDecorator, room, parent);
+            if (rule != null && rule.CanBeApplied(levelDecorator, room))
+            {
+                rule.Apply(levelDecorator, room, parent);
+            }
         }
     }
 }

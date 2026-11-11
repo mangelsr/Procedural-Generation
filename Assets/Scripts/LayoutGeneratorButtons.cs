@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -25,3 +26,4 @@ public class LayoutGeneratorButtons : Editor
         }
     }
 }
+#endif
