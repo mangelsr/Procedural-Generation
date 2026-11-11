@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using Random = System.Random;
-using System.Data;
 
 
 [Serializable]
@@ -115,7 +114,9 @@ public class RoomDecorator : MonoBehaviour
         int currentNumberOfDecorations = 0;
         int maxNumberOfDecorations = room.Area.width * room.Area.height;
 
-        List<RuleAvailability> availableRulesForRoom = CopyRuleAvailability();
+        List<RuleAvailability> availableRulesForRoom = CopyRuleAvailability()
+            .Where(ra => ra.rule.RoomTypes.HasFlag(room.Type))
+            .ToList();
 
         while (currentNumberOfDecorations < maxNumberOfDecorations
                 && currentTries < maxTries

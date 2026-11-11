@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: CornerDecoratorRule
   m_EditorClassIdentifier: 
+  roomTypes: 1
   prefab: {fileID: 2439218787056973520, guid: af76cd76a9939766984868e68b18e16c, type: 3}
+  prefabRotation: 0
   placement:
     array: 04000000040000000400000002000000
     width: 2
@@ -21,3 +23,5 @@ MonoBehaviour:
     array: 04000000040000000400000003000000
     width: 2
     height: 2
+  centerHorizontally: 0
+  centerVertically: 0

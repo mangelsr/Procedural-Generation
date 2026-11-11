@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: TreasureCenterHorizontalWall
   m_EditorClassIdentifier: Assembly-CSharp::PatternMatchingDecoratorRule
+  roomTypes: 17
   prefab: {fileID: 6413463960668125663, guid: d1324490850471f618c0f75bf48a74eb, type: 3}
   prefabRotation: 0
   placement:

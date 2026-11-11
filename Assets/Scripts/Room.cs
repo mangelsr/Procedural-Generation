@@ -1,21 +1,40 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Flags = System.FlagsAttribute;
+
+[Flags]
+public enum RoomType
+{
+    Default = 1,
+    Start = 1 << 1,
+    Exit = 1 << 2,
+    Boss = 1 << 3,
+    Treasure = 1 << 4,
+    Prision = 1 << 5,
+    Library = 1 << 6,
+    Garden = 1 << 7,
+}
 
 public class Room
 {
+    List<Hallway> hallways;
     RectInt area;
     public RectInt Area { get => area; }
     public Texture2D LayoutTexture { get; }
+    public RoomType Type { get; set; } = RoomType.Default;
+    public int Conectedness => hallways.Count;
 
     public Room(RectInt area)
     {
         this.area = area;
+        hallways = new();
     }
 
     public Room(int x, int y, Texture2D layoutTexture)
     {
         area = new RectInt(x, y, layoutTexture.width, layoutTexture.height);
         LayoutTexture = layoutTexture;
+        hallways = new();
     }
 
     public override string ToString()
@@ -90,4 +109,8 @@ public class Room
                 : HallwayDirection.UNDEFINED;
     }
 
+    public void AddHallway(Hallway selectedHallway)
+    {
+        hallways.Add(selectedHallway);
+    }
 }

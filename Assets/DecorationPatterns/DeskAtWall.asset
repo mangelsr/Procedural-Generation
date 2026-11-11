@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: DeskAtWall
   m_EditorClassIdentifier: Assembly-CSharp::PatternMatchingDecoratorRule
+  roomTypes: 67
   prefab: {fileID: 9074271588866406604, guid: 5e60b5b5570574944a6cefa2d972f470, type: 3}
   prefabRotation: 0
   placement:

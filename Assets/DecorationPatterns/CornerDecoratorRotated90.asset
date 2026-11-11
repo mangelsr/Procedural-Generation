@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: CornerDecoratorRotated90
   m_EditorClassIdentifier: 
+  roomTypes: 1
   prefab: {fileID: 2439218787056973520, guid: af76cd76a9939766984868e68b18e16c, type: 3}
   prefabRotation: 90
   placement:
@@ -24,4 +25,3 @@ MonoBehaviour:
     height: 2
   centerHorizontally: 0
   centerVertically: 0
-  decorationOffset: {x: 0, y: 1.5}

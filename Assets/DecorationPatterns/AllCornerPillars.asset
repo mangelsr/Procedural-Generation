@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fd0d62be0344a851a8d78f790b37654, type: 3}
   m_Name: AllCornerPillars
   m_EditorClassIdentifier: Assembly-CSharp::AndDecoratorRule
+  roomTypes: 1
   childRules:
   - {fileID: 11400000, guid: 19b62df426b5421b4bb21cff941271a3, type: 2}
   - {fileID: 11400000, guid: 9b883dd04784b1925885a7918bb79f47, type: 2}

@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: CenterRule
   m_EditorClassIdentifier: 
+  roomTypes: 1
   prefab: {fileID: 0}
+  prefabRotation: 0
   placement:
     array: 020000000200000002000000020000000200000002000000020000000200000002000000
     width: 3
@@ -21,3 +23,5 @@ MonoBehaviour:
     array: 020000000200000002000000020000000600000002000000020000000200000002000000
     width: 3
     height: 3
+  centerHorizontally: 0
+  centerVertically: 0

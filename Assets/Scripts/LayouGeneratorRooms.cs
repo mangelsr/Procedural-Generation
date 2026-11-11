@@ -47,15 +47,13 @@ public class LayoutGeneratorRooms : MonoBehaviour
         Hallway selectedEntryway = openDoorways[random.Next(openDoorways.Count)];
 
         AddRooms();
+        AddHallwaysToRooms();
+        AssignRoomTypes();
 
         DrawLayout(selectedEntryway, roomRect);
 
-        int startRoomIndex = random.Next(level.Rooms.Length);
-        level.PlayerStartRoom = level.Rooms[startRoomIndex];
-
         return level;
     }
-
 
     [ContextMenu("Generate new Seed")]
     public void GenerateNewSeed()
@@ -104,7 +102,7 @@ public class LayoutGeneratorRooms : MonoBehaviour
         layoutTexture.FillWithColor(Color.black);
         float xPos = level.Width * scale / 2.0f - scale;
         float zPos = level.Length * scale / 2.0f - scale;
-        levelLayoutDisplay.transform.position = new Vector3(xPos, 0 , zPos);
+        levelLayoutDisplay.transform.position = new Vector3(xPos, 0, zPos);
 
         Array.ForEach(level.Rooms, room =>
         {
@@ -112,6 +110,8 @@ public class LayoutGeneratorRooms : MonoBehaviour
                 layoutTexture.DrawTexture(room.LayoutTexture, room.Area);
             else
                 layoutTexture.DrawRectangle(room.Area, Color.white);
+
+            Debug.Log($"{room.Area} {room.Conectedness} {room.Type}");
         });
         Array.ForEach(level.Hallways,
             hallway => layoutTexture.DrawLine(
@@ -319,6 +319,87 @@ public class LayoutGeneratorRooms : MonoBehaviour
             roomCandidateRect.x, roomCandidateRect.y,
             roomTemplate.LayoutTexture
         );
+    }
+
+    void AddHallwaysToRooms()
+    {
+        foreach (Room room in level.Rooms)
+        {
+            Hallway[] hallwaysStartingAtRoom = Array.FindAll(
+                level.Hallways,
+                hallway => hallway.StartRoom == room
+            );
+            Array.ForEach(
+                hallwaysStartingAtRoom,
+                hallway => room.AddHallway(hallway)
+            );
+
+            Hallway[] hallwaysEndingAtRoom = Array.FindAll(
+                level.Hallways,
+                hallway => hallway.EndRoom == room
+            );
+            Array.ForEach(
+                hallwaysEndingAtRoom,
+                hallway => room.AddHallway(hallway)
+            );
+        }
+    }
+
+    void AssignRoomTypes()
+    {
+        List<Room> borderRooms = level.Rooms
+            .Where(room => room.Conectedness == 1)
+            .ToList();
+
+        if (borderRooms.Count < 2) return;
+
+        int startRoomIndex = random.Next(borderRooms.Count);
+        Room startRoom = borderRooms[startRoomIndex];
+        level.PlayerStartRoom = startRoom;
+        startRoom.Type = RoomType.Start;
+        borderRooms.Remove(startRoom);
+
+        Room farthestRoom = borderRooms
+            .OrderByDescending(
+                room => Vector2.Distance(startRoom.Area.center, room.Area.center)
+            ).FirstOrDefault();
+        farthestRoom.Type = RoomType.Exit;
+        borderRooms.Remove(farthestRoom);
+
+        List<Room> treasureRooms = borderRooms
+            .OrderBy(_ => random.Next())
+            .Take(3)
+            .ToList();
+
+        borderRooms.RemoveAll(room => treasureRooms.Contains(room));
+
+        treasureRooms.ForEach(room => room.Type = RoomType.Treasure);
+
+        List<Room> emptyRooms = level.Rooms
+            .Where(room => room.Type.HasFlag(RoomType.Default))
+            .ToList();
+          
+        Room boosRoom = emptyRooms
+            .OrderByDescending(
+                room => Vector2.Distance(
+                    startRoom.Area.center, room.Area.center
+                )
+            )
+            .OrderByDescending(room => room.Conectedness)
+            .OrderByDescending(room => room.Area.width * room.Area.height)
+            .FirstOrDefault();
+        
+        boosRoom.Type = RoomType.Boss;
+        emptyRooms.Remove(boosRoom);
+
+        emptyRooms = emptyRooms.OrderBy(_ => random.Next()).ToList();
+        
+        RoomType[] typesToAssign = { RoomType.Prision, RoomType.Library, RoomType.Garden };
+        
+        List<Room> roomsToAssign = emptyRooms.Take(typesToAssign.Length).ToList();
+
+        for (int i = 0; i < roomsToAssign.Count; i++)
+            roomsToAssign[i].Type = typesToAssign[i];
     }
 
 }

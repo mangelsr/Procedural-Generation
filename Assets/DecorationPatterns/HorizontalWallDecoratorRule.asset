@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea239db90a163958b8c572112905b0ce, type: 3}
   m_Name: HorizontalWallDecoratorRule
   m_EditorClassIdentifier: 
+  roomTypes: 7
   prefab: {fileID: 39539218994431968, guid: 62e4c1a21cbe84f11a37951140c91b93, type: 3}
   prefabRotation: 0
   placement:
